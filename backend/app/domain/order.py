@@ -1,7 +1,7 @@
 """Доменные сущности заказа."""
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 
@@ -52,9 +52,9 @@ class OrderItem:
 # Поля: order_id, status, changed_at, id
 @dataclass
 class OrderStatusChange:
-    order_id: str
+    order_id: uuid.UUID
     status: OrderStatus
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
     changed_at: datetime = field(default_factory=datetime.now)
 
 

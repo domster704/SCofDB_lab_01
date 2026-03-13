@@ -134,15 +134,15 @@ class OrderRepository:
         items: list[OrderItem] = await self._load_items(order_id)
         status_history: list[OrderStatusChange] = await self._load_status_history(order_id)
 
-        order = Order(
-            id=row.id,
-            user_id=row.user_id,
-            status=OrderStatus(row.status),
-            total_amount=row.total_amount,
-            created_at=row.created_at,
-            items=items,
-            status_history=status_history
-        )
+        order: Order = object.__new__(Order)
+
+        order.id = row.id
+        order.user_id = row.user_id
+        order.status = OrderStatus(row.status)
+        order.total_amount = row.total_amount
+        order.created_at = row.created_at
+        order.items = items
+        order.status_history = status_history
 
         return order
 

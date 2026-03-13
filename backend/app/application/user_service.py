@@ -23,7 +23,6 @@ class UserService:
             raise EmailAlreadyExistsError(email)
 
         user = User(
-            id=str(uuid.uuid4()),
             email=email,
             name=name,
         )

@@ -134,11 +134,11 @@ DECLARE
     target_order_id UUID;
 BEGIN
     IF TG_OP = 'DELETE' THEN
-        target_order_id := OLD.order_od;
+        target_order_id := OLD.order_id;
     ELSIF TG_OP = 'UPDATE' THEN
         IF NEW.order_id != OLD.order_id THEN
             UPDATE orders
-            SET total_amount = coalesce((SELECT SUM(price * total_amount)
+            SET total_amount = coalesce((SELECT SUM(price * quantity)
                                          FROM order_items
                                          WHERE order_id = OLD.order_id), 0)
             WHERE id = OLD.order_id;
@@ -177,8 +177,8 @@ BEGIN
         VALUES (uuid_generate_v4(), NEW.id, NEW.status);
     ELSIF TG_OP = 'UPDATE' THEN
         IF NEW.status != OLD.status THEN
-            INSERT INTO order_status_history(order_id, status)
-            VALUES (NEW.id, NEW.status);
+            INSERT INTO order_status_history(id, order_id, status)
+            VALUES (uuid_generate_v4(), NEW.id, NEW.status);
         END IF;
     END IF;
 
