@@ -24,11 +24,7 @@ class OrderService:
             raise UserNotFoundError(user_id)
 
         order = Order(
-            id=str(uuid.uuid4()),
-            user_id=str(user_id),
-            status=OrderStatus.CREATED,
-            total_amount=Decimal("0"),
-            created_at=datetime.now(),
+            user_id=user_id,
         )
         await self.order_repo.save(order)
         return order

@@ -30,8 +30,8 @@ class OrderItem:
     product_name: str
     price: Decimal
     quantity: int
-    order_id: str
-    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    order_id: uuid.UUID | None = None
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
 
     @property
     def subtotal(self) -> Decimal:
@@ -68,11 +68,12 @@ class OrderStatusChange:
 #   - complete() -> None
 @dataclass
 class Order:
-    user_id: str
-    id: str
-    created_at: datetime
-    status: OrderStatus
-    total_amount: Decimal
+    user_id: uuid.UUID
+    created_at: datetime = field(default_factory=datetime.now)
+    status: OrderStatus = OrderStatus.CREATED
+    total_amount: Decimal = Decimal("0")
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
+
     items: list[OrderItem] = field(default_factory=list)
     status_history: list[OrderStatusChange] = field(default_factory=list)
 
@@ -82,6 +83,9 @@ class Order:
         )
 
     def add_item(self, product_name: str, price: Decimal, quantity: int) -> OrderItem:
+        if self.status == OrderStatus.CANCELLED:
+            raise OrderCancelledError("Нельзя добавлять товары в отменённый заказ")
+
         item = OrderItem(
             product_name=product_name,
             price=price,
@@ -95,17 +99,16 @@ class Order:
 
     def pay(self) -> None:
         if self.status == OrderStatus.PAID:
-            raise OrderAlreadyPaidError("Заказ уже оплачен")
+            raise OrderAlreadyPaidError(f"Заказ {self.id} уже оплачен")
 
         if self.status == OrderStatus.CANCELLED:
             raise OrderCancelledError("Нельзя оплатить отменённый заказ")
 
-        if self.total_amount <= Decimal("0"):
-            raise InvalidAmountError("Нельзя оплатить заказ с нулевым количеством")
-
         self._change_status(OrderStatus.PAID)
 
     def cancel(self) -> None:
+        if self.status == OrderStatus.PAID:
+            raise OrderAlreadyPaidError(f"Order {self.id} is already paid")
         if self.status == OrderStatus.CANCELLED:
             return
 

@@ -1,5 +1,6 @@
 """Доменная сущность пользователя."""
 import re
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, UTC
 
@@ -16,9 +17,9 @@ EMAIL_REGEXP = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
 
 @dataclass
 class User:
-    id: str
-    name: str
     email: str
+    name: str | None = None
+    id: uuid.UUID = field(default_factory=uuid.uuid4)
     created_at: datetime = field(default_factory=datetime.now)
 
     def __post_init__(self):
