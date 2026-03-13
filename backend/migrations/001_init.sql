@@ -98,8 +98,7 @@ CREATE OR REPLACE FUNCTION check_order_not_already_paid()
     RETURNS TRIGGER AS
 $$
 BEGIN
-
-    IF NEW.satus = 'paid' AND OLD.status != 'paid' THEN
+    IF NEW.status = 'paid' AND OLD.status != 'paid' THEN
         IF EXISTS (SELECT 1
                    FROM order_status_history
                    WHERE order_id = NEW.id
@@ -108,7 +107,8 @@ BEGIN
         END IF;
     END IF;
 
-END ;
+    RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 
