@@ -6,7 +6,7 @@ from typing import List, Optional
 
 from app.domain import User
 from app.domain.exceptions import OrderNotFoundError, UserNotFoundError
-from app.domain.order import Order, OrderItem, OrderStatus
+from app.domain.order import Order, OrderItem
 
 
 class OrderService:
