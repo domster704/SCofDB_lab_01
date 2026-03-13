@@ -10,7 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS order_statuses
 (
     status      VARCHAR(50) PRIMARY KEY,
-    description TEXT
+    description VARCHAR(255)
 );
 -- Столбцы: status (PK), description
 
