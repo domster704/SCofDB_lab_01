@@ -17,7 +17,6 @@ from app.domain.exceptions import (
     OrderCancelledError,
     InvalidQuantityError,
     InvalidPriceError,
-    InvalidAmountError,
 )
 from app.domain.order import Order, OrderItem, OrderStatus
 from app.domain.user import User
@@ -138,7 +137,7 @@ class TestOrderInvariants:
     def test_add_item_to_order(self):
         """Items can be added to order."""
         order = Order(user_id=uuid.uuid4())
-        item = order.add_item("Product", Decimal("100.00"), 2)
+        order.add_item("Product", Decimal("100.00"), 2)
 
         assert len(order.items) == 1
         assert order.total_amount == Decimal("200.00")
