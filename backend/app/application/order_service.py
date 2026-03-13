@@ -1,7 +1,6 @@
 """Сервис для работы с заказами."""
 
 import uuid
-from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -28,7 +27,6 @@ class OrderService:
         )
         await self.order_repo.save(order)
         return order
-
 
     # TODO: Реализовать get_order(order_id) -> Order
     async def get_order(self, order_id: uuid.UUID) -> Order:

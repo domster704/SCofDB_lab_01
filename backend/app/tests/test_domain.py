@@ -7,12 +7,10 @@ All tests must pass for the lab to be accepted.
 DO NOT MODIFY THIS FILE!
 """
 
-import pytest
 import uuid
 from decimal import Decimal
 
-from app.domain.user import User
-from app.domain.order import Order, OrderItem, OrderStatus
+import pytest
 from app.domain.exceptions import (
     InvalidEmailError,
     OrderAlreadyPaidError,
@@ -21,6 +19,8 @@ from app.domain.exceptions import (
     InvalidPriceError,
     InvalidAmountError,
 )
+from app.domain.order import Order, OrderItem, OrderStatus
+from app.domain.user import User
 
 
 class TestUserInvariants:
@@ -130,7 +130,7 @@ class TestOrderInvariants:
         """Order can be created."""
         user_id = uuid.uuid4()
         order = Order(user_id=user_id)
-        
+
         assert order.user_id == user_id
         assert order.status == OrderStatus.CREATED
         assert order.total_amount == Decimal("0")
@@ -139,7 +139,7 @@ class TestOrderInvariants:
         """Items can be added to order."""
         order = Order(user_id=uuid.uuid4())
         item = order.add_item("Product", Decimal("100.00"), 2)
-        
+
         assert len(order.items) == 1
         assert order.total_amount == Decimal("200.00")
 
@@ -148,7 +148,7 @@ class TestOrderInvariants:
         order = Order(user_id=uuid.uuid4())
         order.add_item("Product 1", Decimal("100.00"), 1)
         order.add_item("Product 2", Decimal("50.00"), 2)
-        
+
         assert order.total_amount == Decimal("200.00")
 
     def test_pay_order(self):
@@ -156,7 +156,7 @@ class TestOrderInvariants:
         order = Order(user_id=uuid.uuid4())
         order.add_item("Product", Decimal("100.00"), 1)
         order.pay()
-        
+
         assert order.status == OrderStatus.PAID
 
     def test_cannot_pay_order_twice(self):
@@ -164,7 +164,7 @@ class TestOrderInvariants:
         order = Order(user_id=uuid.uuid4())
         order.add_item("Product", Decimal("100.00"), 1)
         order.pay()
-        
+
         with pytest.raises(OrderAlreadyPaidError):
             order.pay()
 
@@ -172,7 +172,7 @@ class TestOrderInvariants:
         """INVARIANT: Cancelled order cannot be paid."""
         order = Order(user_id=uuid.uuid4())
         order.cancel()
-        
+
         with pytest.raises(OrderCancelledError):
             order.pay()
 
@@ -180,14 +180,14 @@ class TestOrderInvariants:
         """Order can be cancelled."""
         order = Order(user_id=uuid.uuid4())
         order.cancel()
-        
+
         assert order.status == OrderStatus.CANCELLED
 
     def test_cannot_cancel_paid_order(self):
         """INVARIANT: Paid order cannot be cancelled."""
         order = Order(user_id=uuid.uuid4())
         order.pay()
-        
+
         with pytest.raises(OrderAlreadyPaidError):
             order.cancel()
 
@@ -195,14 +195,14 @@ class TestOrderInvariants:
         """INVARIANT: Items cannot be added to cancelled order."""
         order = Order(user_id=uuid.uuid4())
         order.cancel()
-        
+
         with pytest.raises(OrderCancelledError):
             order.add_item("Product", Decimal("100.00"), 1)
 
     def test_ship_order_requires_paid_status(self):
         """INVARIANT: Order must be paid before shipping."""
         order = Order(user_id=uuid.uuid4())
-        
+
         with pytest.raises(ValueError):
             order.ship()
 
@@ -210,7 +210,7 @@ class TestOrderInvariants:
         """INVARIANT: Order must be shipped before completing."""
         order = Order(user_id=uuid.uuid4())
         order.pay()
-        
+
         with pytest.raises(ValueError):
             order.complete()
 
@@ -218,7 +218,7 @@ class TestOrderInvariants:
 class TestCriticalPaymentInvariant:
     """
     Special test class for the CRITICAL invariant: cannot pay twice.
-    
+
     This is the main requirement of the lab!
     """
 
@@ -226,7 +226,7 @@ class TestCriticalPaymentInvariant:
         """Basic test: second pay() call must raise OrderAlreadyPaidError."""
         order = Order(user_id=uuid.uuid4())
         order.pay()
-        
+
         with pytest.raises(OrderAlreadyPaidError):
             order.pay()
 
@@ -235,7 +235,7 @@ class TestCriticalPaymentInvariant:
         order = Order(user_id=uuid.uuid4())
         order.add_item("Product", Decimal("100.00"), 1)
         order.pay()
-        
+
         with pytest.raises(OrderAlreadyPaidError):
             order.pay()
 
@@ -243,20 +243,20 @@ class TestCriticalPaymentInvariant:
         """Order status must remain PAID after failed double payment."""
         order = Order(user_id=uuid.uuid4())
         order.pay()
-        
+
         try:
             order.pay()
         except OrderAlreadyPaidError:
             pass
-        
+
         assert order.status == OrderStatus.PAID
 
     def test_exception_contains_order_id(self):
         """OrderAlreadyPaidError should contain order ID."""
         order = Order(user_id=uuid.uuid4())
         order.pay()
-        
+
         with pytest.raises(OrderAlreadyPaidError) as exc_info:
             order.pay()
-        
+
         assert str(order.id) in str(exc_info.value)

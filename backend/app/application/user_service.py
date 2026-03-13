@@ -3,8 +3,8 @@
 import uuid
 from typing import Optional, List
 
-from app.domain.user import User
 from app.domain.exceptions import EmailAlreadyExistsError, UserNotFoundError
+from app.domain.user import User
 
 
 class UserService:

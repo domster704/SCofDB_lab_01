@@ -1,8 +1,9 @@
 """Доменная сущность пользователя."""
+
 import re
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, UTC
+from datetime import datetime
 
 from .exceptions import InvalidEmailError
 

@@ -1,4 +1,5 @@
 """Доменные сущности заказа."""
+
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -7,7 +8,10 @@ from enum import Enum
 
 from .exceptions import (
     InvalidQuantityError,
-    InvalidPriceError, InvalidAmountError, OrderCancelledError, OrderAlreadyPaidError,
+    InvalidPriceError,
+    InvalidAmountError,
+    OrderCancelledError,
+    OrderAlreadyPaidError,
 )
 
 

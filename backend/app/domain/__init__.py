@@ -1,8 +1,6 @@
 # Domain layer exports
 # Students must implement these classes
 
-from .user import User
-from .order import Order, OrderItem, OrderStatus, OrderStatusChange
 from .exceptions import (
     DomainException,
     InvalidEmailError,
@@ -15,6 +13,8 @@ from .exceptions import (
     OrderNotFoundError,
     EmailAlreadyExistsError,
 )
+from .order import Order, OrderItem, OrderStatus, OrderStatusChange
+from .user import User
 
 __all__ = [
     "User",

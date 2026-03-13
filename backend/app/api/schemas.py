@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
-from typing import List, Optional
+from typing import List
 
 from pydantic import BaseModel, EmailStr, Field
 

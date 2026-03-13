@@ -3,15 +3,9 @@
 import uuid
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.infrastructure.db import get_db
-from app.infrastructure.repositories import UserRepository, OrderRepository
-from app.application.user_service import UserService
 from app.application.order_service import OrderService
+from app.application.user_service import UserService
 from app.domain.exceptions import (
-    DomainException,
     InvalidEmailError,
     EmailAlreadyExistsError,
     UserNotFoundError,
@@ -21,6 +15,10 @@ from app.domain.exceptions import (
     InvalidQuantityError,
     InvalidPriceError,
 )
+from app.infrastructure.db import get_db
+from app.infrastructure.repositories import UserRepository, OrderRepository
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .schemas import (
     CreateUser,
@@ -51,7 +49,9 @@ def get_order_service(db: AsyncSession = Depends(get_db)) -> OrderService:
 
 # User endpoints
 @router.post("/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def create_user(data: CreateUser, service: UserService = Depends(get_user_service)):
+async def create_user(
+    data: CreateUser, service: UserService = Depends(get_user_service)
+):
     """Register a new user."""
     try:
         user = await service.register(data.email, data.name)
@@ -83,7 +83,9 @@ async def list_users(service: UserService = Depends(get_user_service)):
 
 
 @router.get("/users/{user_id}", response_model=UserResponse)
-async def get_user(user_id: uuid.UUID, service: UserService = Depends(get_user_service)):
+async def get_user(
+    user_id: uuid.UUID, service: UserService = Depends(get_user_service)
+):
     """Get user by ID."""
     try:
         user = await service.get_by_id(user_id)
@@ -98,8 +100,12 @@ async def get_user(user_id: uuid.UUID, service: UserService = Depends(get_user_s
 
 
 # Order endpoints
-@router.post("/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
-async def create_order(data: CreateOrder, service: OrderService = Depends(get_order_service)):
+@router.post(
+    "/orders", response_model=OrderResponse, status_code=status.HTTP_201_CREATED
+)
+async def create_order(
+    data: CreateOrder, service: OrderService = Depends(get_order_service)
+):
     """Create a new order."""
     try:
         order = await service.create_order(data.user_id)
@@ -119,7 +125,9 @@ async def list_orders(
 
 
 @router.get("/orders/{order_id}", response_model=OrderDetailResponse)
-async def get_order(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+async def get_order(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Get order by ID with full details."""
     try:
         order = await service.get_order(order_id)
@@ -128,7 +136,11 @@ async def get_order(order_id: uuid.UUID, service: OrderService = Depends(get_ord
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
-@router.post("/orders/{order_id}/items", response_model=OrderItemResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/orders/{order_id}/items",
+    response_model=OrderItemResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def add_order_item(
     order_id: uuid.UUID,
     data: AddOrderItem,
@@ -158,7 +170,9 @@ async def add_order_item(
 
 
 @router.post("/orders/{order_id}/pay", response_model=OrderResponse)
-async def pay_order(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+async def pay_order(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Pay for an order."""
     try:
         order = await service.pay_order(order_id)
@@ -172,7 +186,9 @@ async def pay_order(order_id: uuid.UUID, service: OrderService = Depends(get_ord
 
 
 @router.post("/orders/{order_id}/cancel", response_model=OrderResponse)
-async def cancel_order(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+async def cancel_order(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Cancel an order."""
     try:
         order = await service.cancel_order(order_id)
@@ -184,7 +200,9 @@ async def cancel_order(order_id: uuid.UUID, service: OrderService = Depends(get_
 
 
 @router.post("/orders/{order_id}/ship", response_model=OrderResponse)
-async def ship_order(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+async def ship_order(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Ship an order."""
     try:
         order = await service.ship_order(order_id)
@@ -196,7 +214,9 @@ async def ship_order(order_id: uuid.UUID, service: OrderService = Depends(get_or
 
 
 @router.post("/orders/{order_id}/complete", response_model=OrderResponse)
-async def complete_order(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+async def complete_order(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Complete an order."""
     try:
         order = await service.complete_order(order_id)
@@ -207,8 +227,12 @@ async def complete_order(order_id: uuid.UUID, service: OrderService = Depends(ge
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
-@router.get("/orders/{order_id}/history", response_model=List[OrderStatusChangeResponse])
-async def get_order_history(order_id: uuid.UUID, service: OrderService = Depends(get_order_service)):
+@router.get(
+    "/orders/{order_id}/history", response_model=List[OrderStatusChangeResponse]
+)
+async def get_order_history(
+    order_id: uuid.UUID, service: OrderService = Depends(get_order_service)
+):
     """Get order status history."""
     try:
         history = await service.get_order_history(order_id)
