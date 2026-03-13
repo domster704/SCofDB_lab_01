@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS orders
     id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id      UUID        NOT NULL REFERENCES users (id),
     status       VARCHAR(50) NOT NULL REFERENCES order_statuses (status),
-    total_amount INTEGER CHECK ( total_amount >= 0 ),
+    total_amount NUMERIC(12, 2) CHECK ( total_amount >= 0 ),
     created_at   TIMESTAMP        DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -42,10 +42,10 @@ class OrderItem:
             raise ValueError("Имя не может быть пустым")
 
         if self.quantity <= 0:
-            raise InvalidQuantityError("Количество должно быть больше 0")
+            raise InvalidQuantityError(self.quantity)
 
         if self.price < Decimal("0"):
-            raise InvalidPriceError("Цена должна быть больше или равна 0")
+            raise InvalidPriceError(self.price)
 
 
 # TODO: Реализовать OrderStatusChange (dataclass)
@@ -84,7 +84,7 @@ class Order:
 
     def add_item(self, product_name: str, price: Decimal, quantity: int) -> OrderItem:
         if self.status == OrderStatus.CANCELLED:
-            raise OrderCancelledError("Нельзя добавлять товары в отменённый заказ")
+            raise OrderCancelledError(self.id)
 
         item = OrderItem(
             product_name=product_name,
@@ -99,16 +99,16 @@ class Order:
 
     def pay(self) -> None:
         if self.status == OrderStatus.PAID:
-            raise OrderAlreadyPaidError(f"Заказ {self.id} уже оплачен")
+            raise OrderAlreadyPaidError(self.id)
 
         if self.status == OrderStatus.CANCELLED:
-            raise OrderCancelledError("Нельзя оплатить отменённый заказ")
+            raise OrderCancelledError(self.id)
 
         self._change_status(OrderStatus.PAID)
 
     def cancel(self) -> None:
         if self.status == OrderStatus.PAID:
-            raise OrderAlreadyPaidError(f"Order {self.id} is already paid")
+            raise OrderAlreadyPaidError(self.id)
         if self.status == OrderStatus.CANCELLED:
             return
 
@@ -135,6 +135,6 @@ class Order:
     def _recalculate_total(self) -> None:
         total = sum(item.subtotal for item in self.items)
         if total < Decimal("0"):
-            raise InvalidAmountError("Количество не может быть отрицательным")
+            raise InvalidAmountError(total)
 
         self.total_amount = total

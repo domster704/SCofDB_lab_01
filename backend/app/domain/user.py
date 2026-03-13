@@ -24,7 +24,7 @@ class User:
 
     def __post_init__(self):
         if not isinstance(self.email, str) or not self.email.strip():
-            raise InvalidEmailError("Почта должна быть непустой строкой")
+            raise InvalidEmailError(self.email)
 
         if not re.match(EMAIL_REGEXP, self.email):
-            raise InvalidEmailError(f"Неправильный формат: {self.email}")
+            raise InvalidEmailError(self.email)
