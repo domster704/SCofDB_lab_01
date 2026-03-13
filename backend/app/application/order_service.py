@@ -1,6 +1,7 @@
 """Сервис для работы с заказами."""
 
 import uuid
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -25,9 +26,9 @@ class OrderService:
         order = Order(
             id=str(uuid.uuid4()),
             user_id=str(user_id),
-            status="created",
+            status=OrderStatus.CREATED,
             total_amount=Decimal("0"),
-            created_at=None,
+            created_at=datetime.now(),
         )
         await self.order_repo.save(order)
         return order

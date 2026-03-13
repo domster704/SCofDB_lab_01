@@ -55,7 +55,7 @@ class OrderStatusChange:
     order_id: str
     status: OrderStatus
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    changed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    changed_at: datetime = field(default_factory=datetime.now)
 
 
 # TODO: Реализовать Order (dataclass)

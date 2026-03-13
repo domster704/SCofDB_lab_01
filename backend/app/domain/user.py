@@ -19,7 +19,7 @@ class User:
     id: str
     name: str
     email: str
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = field(default_factory=datetime.now)
 
     def __post_init__(self):
         if not isinstance(self.email, str) or not self.email.strip():
